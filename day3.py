@@ -35,6 +35,10 @@ def mapped_numbers_and_positions(numbers: list[str], line: str):
     return parts
 
 
+def highlight_string_index(string, index):
+    return string[:index] + '\x1b[6;30;47m' + string[index] + '\x1b[0m' + string[index:]
+
+
 def check_adjacency(parts: list[PotentialPart], previous_line: str, current_line: str, next_line: str):
     adjacent_parts = []
     for part in parts:
@@ -44,15 +48,27 @@ def check_adjacency(parts: list[PotentialPart], previous_line: str, current_line
 
         console_output = ''
         for i in positions_to_check:
-            if previous_line != '' and not previous_line[i].isspace():
-                adjacent_parts.append(part.number)
-                break
-            elif i not in positions_to_skip and not current_line[i].isspace():
-                adjacent_parts.append(part.number)
-                break
-            elif next_line != '' and not next_line[i].isspace():
-                adjacent_parts.append(part.number)
-                break
+            # if previous_line != '' and not previous_line[i].isspace():
+            if previous_line != '':
+                print(highlight_string_index(previous_line, i))
+                if not previous_line[i].isspace():
+                    print(f"found symbol: {previous_line[i]}")
+                    adjacent_parts.append(part.number)
+                    break
+            # if i not in positions_to_skip and not current_line[i].isspace():
+            if i not in positions_to_skip:
+                print(highlight_string_index(current_line, i))
+                if not current_line[i].isspace():
+                    print(f"found symbol: {current_line[i]}")
+                    adjacent_parts.append(part.number)
+                    break
+            # if next_line != '' and not next_line[i].isspace():
+            if next_line != '':
+                print(highlight_string_index(next_line, i))
+                if not next_line[i].isspace():
+                    print(f"found symbol: {next_line[i]}")
+                    adjacent_parts.append(part.number)
+                    break
     print(f"Adjacent parts: {adjacent_parts}")
     return adjacent_parts
 
