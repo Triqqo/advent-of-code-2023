@@ -24,10 +24,11 @@ def mapped_numbers_and_positions(numbers: list[str], line: str):
         line_length = len(line)
         part = PotentialPart(number=int(number_str))
 
-        part.first_position = int(line.rfind(number_str)) if number_str in duplicates else int(line.find(number_str))
+        part_matches = list(re.finditer(rf'(?<!\d)({number_str})(?!\d)', line))
+
+        part.first_position = part_matches[1].start(0) if number_str in duplicates else part_matches[0].start(0)
         part.first_adj_position = max([part.first_position - 1, 0])
 
-        # last_adj_position_offset = 1 if part.first_position > 0 else 0
         part.last_position = part.first_position + (len(number_str) - 1)
         part.last_adj_position = min([part.last_position + 1, line_length - 1])
 
@@ -36,7 +37,7 @@ def mapped_numbers_and_positions(numbers: list[str], line: str):
 
 
 def highlight_string_index(string, index):
-    return string[:index] + '\x1b[6;30;47m' + string[index] + '\x1b[0m' + string[index:]
+    return string[:index] + '\x1b[6;30;47m' + string[index] + '\x1b[0m' + string[index + 1:]
 
 
 def check_adjacency(parts: list[PotentialPart], previous_line: str, current_line: str, next_line: str):
@@ -46,29 +47,32 @@ def check_adjacency(parts: list[PotentialPart], previous_line: str, current_line
         positions_to_check = list(range(part.first_adj_position, part.last_adj_position + 1))
         positions_to_skip = list(range(part.first_position, part.last_position + 1))
 
-        console_output = ''
+        print(f"part: \x1b[6;30;44m{part.number}\x1b[0m")
+        print(f"line: \x1b[6;30;44m {current_line}\x1b[0m")
         for i in positions_to_check:
             # if previous_line != '' and not previous_line[i].isspace():
             if previous_line != '':
-                print(highlight_string_index(previous_line, i))
-                if not previous_line[i].isspace():
-                    print(f"found symbol: {previous_line[i]}")
+                print("prev: " + highlight_string_index(previous_line, i))
+                if not previous_line[i].isspace() and not previous_line[i].isdigit():
+                    print(f"\x1b[6;30;42mfound symbol: {previous_line[i]}\x1b[0m")
                     adjacent_parts.append(part.number)
                     break
             # if i not in positions_to_skip and not current_line[i].isspace():
             if i not in positions_to_skip:
-                print(highlight_string_index(current_line, i))
+                print("this: " + highlight_string_index(current_line, i))
                 if not current_line[i].isspace():
-                    print(f"found symbol: {current_line[i]}")
+                    print(f"\x1b[6;30;42mfound symbol: {current_line[i]}\x1b[0m")
                     adjacent_parts.append(part.number)
                     break
             # if next_line != '' and not next_line[i].isspace():
             if next_line != '':
-                print(highlight_string_index(next_line, i))
+                print("next: " + highlight_string_index(next_line, i))
                 if not next_line[i].isspace():
-                    print(f"found symbol: {next_line[i]}")
+                    print(f"\x1b[6;30;42mfound symbol: {next_line[i]}\x1b[0m")
                     adjacent_parts.append(part.number)
                     break
+        else:
+            print("\x1b[6;30;41mno symbol found\x1b[0m")
     print(f"Adjacent parts: {adjacent_parts}")
     return adjacent_parts
 

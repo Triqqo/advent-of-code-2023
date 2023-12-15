@@ -1,6 +1,7 @@
 import dataclasses
 import re
 from dataclasses import dataclass
+from typing import Optional
 
 
 @dataclass
@@ -14,9 +15,9 @@ class GameSet:
 class Game:
     id: int
     game_results_str: str
-    sets: list[GameSet] = None
+    sets: list[GameSet] = []
     is_possible: bool = False
-    fewest_needed_cubes: GameSet = None
+    fewest_needed_cubes: GameSet = GameSet()
     power: int = 0
 
 
@@ -28,6 +29,7 @@ class Constants:
 
 def parse_game_dict(game_str: str) -> Game:
     match = re.search(r'^Game (?P<game_id>\d+): (?P<game_results_str>[a-zA-Z0-9;, ]*)$', game_str)
+    assert match is not None
 
     return Game(id=int(match.group('game_id')), game_results_str=match.group('game_results_str'))
 

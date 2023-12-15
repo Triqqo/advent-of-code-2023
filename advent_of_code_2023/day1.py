@@ -1,17 +1,20 @@
-import dataclasses
 import re
-from dataclasses import dataclass
+import os
 
+
+filename = os.path.join(os.path.dirname(__file__), 'day1/input.txt')
 
 def fetch_first_and_last_digit_regex(line: str):
-    first = re.search(r'\d', line).group(0)
-    last = re.search(r'\d(?![\s\S]*\d)', line).group(0)
-    return str(first) + str(last)
+    first_match = re.search(r'\d', line)
+    first_digit = first_match.group(0) if first_match else 0
+    last_match = re.search(r'\d(?![\s\S]*\d)', line)
+    last_digit = last_match.group(0) if last_match else 0
+    return str(first_digit) + str(last_digit)
 
 
 def day1_part1():
     numbers = []
-    with open('day1/input.txt') as f:
+    with open(filename) as f:
         for line in f.readlines():
             calibrated = fetch_first_and_last_digit_regex(line)
             print(calibrated)
@@ -55,7 +58,7 @@ def get_calibrated_int(digits: list[str]) -> int:
 
 def day1_part2() -> int:
     numbers = []
-    with open('day1/input.txt') as f:
+    with open(filename) as f:
         for line in f.readlines():
             print(line)
             matched_digits = find_all_digits(line)
